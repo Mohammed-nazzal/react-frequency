@@ -43,6 +43,7 @@ function RealTimeFrequencyAnalyzer() {
       const barHeightFactor = canvas.height / 256; // Adjust as needed
       for (let i = 0; i < frequencyData.length; i++) {
         const barHeight = frequencyData[i] * barHeightFactor;
+        ctx.fillStyle = 'rgb(' + (barHeight) + ',68,150)'
         ctx.fillRect(i * barWidth, canvas.height - barHeight, barWidth, barHeight);
       }
 
@@ -57,8 +58,8 @@ function RealTimeFrequencyAnalyzer() {
   }, []);
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', border: '1px solid blue' }}>
-      <canvas color='red' ref={canvasRef} width="800" height="400" />
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', border: '1px solid blue', width: '80%', alignSelf: 'center', borderTopLeftRadius: '3rem', borderTopRightRadius: '3rem', margin: '3rem' }}>
+        <canvas style={{ border: '4px solid black' }} color='red' ref={canvasRef} width="800" height="400" />
     </div>
   );
 }
