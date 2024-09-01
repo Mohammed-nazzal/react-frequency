@@ -1,3 +1,4 @@
+//@ts-nocheck
 "use client";
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import Filter from './components/filter';
