@@ -11,13 +11,13 @@ function App() {
 //     detune: osc1.detune.value,
 //     type: osc1.type,
 //   });
-const canvasRef = useRef(null);
+const canvasRef = useRef<HTMLCanvasElement>(null);
 const audioContextRef = useRef(null);
 const analyserRef = useRef(null);
   const [filterSettings1, setFilterSettings1] = useState({
     frequency: 1000,
     // detune: filter.detune.value,
-    // Q: filter.Q.value,
+    Q: 0.5,
     // gain: filter.gain.value,
     type: 'lowpass',
   });
@@ -43,9 +43,9 @@ const analyserRef = useRef(null);
   let filter = actx.createBiquadFilter();
   filter.type = filterSettings1.type;
   filter.frequency.value = filterSettings1.frequency;
-  analyser.connect(gain1);
-  gain1.connect(filter);
-  filter.connect(out);
+  filter.Q.value = filterSettings1.Q;
+  filter.connect(analyser);
+  analyser.connect(actx.destination);
   
 
   audioContextRef.current = actx;
@@ -54,7 +54,7 @@ const analyserRef = useRef(null);
   
   // Set analyzer parameters (e.g., frequency bin count)
   analyser.fftSize = 2048; // Adjust as needed
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
 
     audioContextRef.current = actx;
@@ -62,34 +62,54 @@ const analyserRef = useRef(null);
     analyserRef.current = analyser;
 
     // Set analyzer parameters (e.g., frequency bin count)
-    analyser.fftSize = 2048; // Adjust as needed
+    analyser.fftSize = 8192; // Adjust as needed
 
     // Start capturing audio input
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
         const source = actx.createMediaStreamSource(stream);
-        source.connect(analyser);
+        source.connect(filter);
       })
       .catch(error => {
         console.error('Error accessing microphone:', error);
       });
 
     // Update visualization in a loop
+    const freqValues = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000]
+    const position = (f: number) => {
+      return ((Math.log10(f) - Math.log10(20))/ (Math.log10(20000) - Math.log10(20))) * (canvas.width - 30)
+      // console.log(((Math.log10(f) - Math.log10(20))/ (Math.log10(20000) - Math.log10(20))) * canvas.width)
+    }
+    ctx.beginPath();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#000000";
+    ctx.moveTo(0, canvas.height - 10);
+  ctx.lineTo((canvas.width - 30), canvas.height - 10);
+  ctx.stroke();
+    ctx.strokeStyle = 'red'
+    for(let w of freqValues) {
+      ctx.font = '9px Arial';
+      ctx.textAlign = 'start';
+      ctx.fillText(w.toString(), position(w), canvas.height) 
+    }
     const updateVisualization = () => {
       const frequencyData = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(frequencyData);
-
       // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, (canvas.width - 30), (canvas.height - 10));
 
       // Draw frequency spectrum
-      const barWidth = canvas.width / frequencyData.length;
-      const barHeightFactor = canvas.height / 256; // Adjust as needed
+      const barWidth = (canvas.width - 30) / frequencyData.length;
+      const barHeightFactor = (canvas.height - 10) / 256; // Adjust as needed
       for (let i = 0; i < frequencyData.length; i++) {
         const barHeight = frequencyData[i] * barHeightFactor;
+        
         ctx.fillStyle = 'rgb(' + (barHeight) + ',68,150)'
-        ctx.fillRect(i * barWidth, canvas.height - barHeight, barWidth, barHeight);
+        ctx.fillRect(i * barWidth, (canvas.height - 10) - barHeight, barWidth, barHeight);
       }
+     
+      
+      
 
       requestAnimationFrame(updateVisualization);
     };
@@ -116,6 +136,7 @@ const analyserRef = useRef(null);
     let { value, id } = e.target;
     setFilterSettings1({ ...filterSettings1, [id]: value });
   };
+
 
   const changeFilterType = (e:ChangeEvent<HTMLInputElement>) => {
     let { id } = e.target;
@@ -150,8 +171,8 @@ const analyserRef = useRef(null);
         settings={filterSettings1}
         changeType={changeFilterType}
       />
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', border: '1px solid blue', width: '80%', alignSelf: 'center', borderTopLeftRadius: '3rem', borderTopRightRadius: '3rem', margin: '3rem' }}>
-        <canvas style={{ border: '4px solid black' }} color='red' ref={canvasRef} width="800" height="400" />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh',width: '80%', alignSelf: 'center', borderTopLeftRadius: '3rem', borderTopRightRadius: '3rem', margin: '3rem' }}>
+        <canvas color='red' ref={canvasRef} width="830" height="410" />
       </div>
       {/* <div>{filterSettings1.frequency}</div> */}
       {/* <Filter

@@ -19,10 +19,6 @@ export default function Home() {
       </div>
 
       <div className={styles.grid}>
-
-        <div className={styles.pagecard}>
-          <Link href="/analyzer">Real Time Frequency Analyzer</Link>
-        </div>
         <div className={styles.pagecard}>
           <Link href="/rangeanalyzer">Range Analyzer</Link>
         </div>

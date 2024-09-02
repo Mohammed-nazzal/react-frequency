@@ -40,10 +40,12 @@
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(50%, auto));
-  max-width: 100%;
-  width: var(--max-width);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin-top: 3rem;
 }
 
 .card {

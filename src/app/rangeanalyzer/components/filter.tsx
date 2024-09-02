@@ -3,12 +3,13 @@ type Filter = {
   settings: {
     frequency: number;
     type: BiquadFilterType;
+    Q?: number;
   },
   change:(e:ChangeEvent<HTMLInputElement>) => void,
   changeType:MouseEventHandler<HTMLButtonElement>
 }
 const Filter = ({ change, settings, changeType }: Filter) => {
-  const { frequency, type } = settings;
+  const { frequency, type, Q } = settings;
   return (
     <div className='control'>
       <h2>filter</h2>
@@ -19,12 +20,27 @@ const Filter = ({ change, settings, changeType }: Filter) => {
           type='range'
           onChange={change}
           id='frequency'
-          max='10000'
+          max='20000'
+        />
+      </div>
+      <div className='params'>
+        <h3>Q</h3>
+        <input
+          value={Q}
+          type='range'
+          onChange={change}
+          id='Q'
+          max='10'
+          step={0.1}
         />
       </div>
       <div className='param'>
         <h2>{'Filter Frequency'}</h2>
         <h3>{settings.frequency}</h3>
+      </div>
+      <div className='param'>
+        <h2>{'Filter Q'}</h2>
+        <h3>{settings.Q}</h3>
       </div>
       <div className='param'>
         <h2>type</h2>
@@ -62,6 +78,13 @@ const Filter = ({ change, settings, changeType }: Filter) => {
           className={`${type === 'highshelf' && 'active'}`}
         >
           highshelf
+        </button>
+        <button
+          onClick={changeType}
+          id='bandpass'
+          className={`${type === 'bandpass' && 'active'}`}
+        >
+          bandpass
         </button>
         {/* <button
           onClick={changeType}
