@@ -19,7 +19,7 @@ const analyserRef = useRef(null);
     frequency: 1000,
     // detune: filter.detune.value,
     Q: 0.5,
-    // gain: filter.gain.value,
+    gain: 1,
     type: 'lowpass',
   });
 
@@ -45,6 +45,7 @@ const analyserRef = useRef(null);
   filter.type = filterSettings1.type;
   filter.frequency.value = filterSettings1.frequency;
   filter.Q.value = filterSettings1.Q;
+  filter.gain.value = filterSettings1.gain;
   filter.connect(analyser);
   analyser.connect(actx.destination);
   
